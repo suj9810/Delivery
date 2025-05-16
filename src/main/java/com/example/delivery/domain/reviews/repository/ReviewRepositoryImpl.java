@@ -32,6 +32,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
 		List<Review> content = queryFactory
 			.selectFrom(review)
 			.where(
+				review.store.id.eq(condition.getStoreId()),
 				minRating(condition.getMinRating()),
 				maxRating(condition.getMaxRating())
 			)
@@ -44,6 +45,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
 			.select(review)
 			.from(review)
 			.where(
+				review.store.id.eq(condition.getStoreId()),
 				minRating(condition.getMinRating()),
 				maxRating(condition.getMaxRating())
 			);
