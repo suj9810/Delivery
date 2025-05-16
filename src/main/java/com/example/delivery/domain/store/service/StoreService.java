@@ -1,9 +1,91 @@
 package com.example.delivery.domain.store.service;
 
+import com.example.delivery.domain.store.dto.request.SaveStoreRequestDto;
+import com.example.delivery.domain.store.dto.request.UpdateStoreRequestDto;
+import com.example.delivery.domain.store.dto.response.SaveStoreResponseDto;
+import com.example.delivery.domain.store.dto.response.StoreIdAndNameResponseDto;
+import com.example.delivery.domain.store.dto.response.StoreResponseDto;
+import com.example.delivery.domain.store.entity.Store;
+import com.example.delivery.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class StoreService {
+
+    private final StoreRepository storeRepository;
+
+    public SaveStoreResponseDto saveStore(userId, SaveStoreRequestDto dto) {
+        
+        User user = userRespository.findbyId(userId);
+        
+        Store store = Store.builder()
+                .storeName(dto.getStoreName())
+                .address(dto.getAddress())
+                .phoneNumber(dto.getPhoneNumber())
+                .minOrderPrice(dto.getMinOrderPrice())
+                .openTime(dto.getOpenTime())
+                .closedTime(dto.getClosedTime())
+                .user(user)
+                .build();
+        
+        Store savedStore = storeRepository.save(store);
+
+        return new SaveStoreResponseDto(
+                savedStore.getId(),
+                savedStore.getStoreName(),
+                savedStore.getAddress(),
+                savedStore.getPhoneNumber(),
+                savedStore.getMinOrderPrice(), 
+                savedStore.getOpenTime(),
+                savedStore.getClosedTime());
+    }
+//
+//    public Page<StoreIdAndNameResponseDto> getStores(Pageable pageable, String storeName) {
+//        // querydsl 사용
+//    }
+
+
+    public StoreResponseDto getStore(Long storeId) {
+        
+        Store store = findByIdOrElseThrow(storeId);
+        
+        return new StoreResponseDto(
+                store.getId(), 
+                store.getStoreName(), 
+                store.getAddress(), 
+                store.getPhoneNumber(), 
+                store.getMinOrderPrice(),
+                store.getOpenTime(),
+                store.getClosedTime()
+        );
+    }
+
+    public void updateStore(Long storeId, UpdateStoreRequestDto dto) {
+
+        Store store = findByIdOrElseThrow(storeId);
+        
+        store.update(
+                dto.getStoreName(),
+                dto.getAddress(),
+                dto.getPhoneNumber(),
+                dto.getOpenTime(),
+                dto.getClosedTime(),
+                dto.getMinOrderPrice()
+        );
+    }
+
+    public void deleteStore(Long storeId) {
+
+        Store store = findByIdOrElseThrow(storeId);
+
+        storeRepository.delete(store);
+    }
+    
+    private Store findByIdOrElseThrow (Long storeId) {
+        return storeRepository.findById(storeId).orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
+    }
 }
