@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
-@Setter
 public class ReviewFindCondition {
 	private Long storeId;
 	private Long minRating;
