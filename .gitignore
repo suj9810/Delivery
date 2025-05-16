@@ -46,3 +46,5 @@ out/
 
 # .gitignore 파일에 아래 추가
 /build.gradle
+/.gradle/
+/.idea/
