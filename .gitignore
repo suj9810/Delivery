@@ -1,6 +1,8 @@
 HELP.md
-.gradle
+
+.gradle/
 build/
+
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
@@ -44,3 +46,5 @@ out/
 
 # .gitignore 파일에 아래 추가
 /build.gradle
+/.gradle/
+/.idea/
