@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.delivery.common.exception.enums.SuccessCode;
 import com.example.delivery.common.response.ApiResponseDto;
+import com.example.delivery.domain.auth.jwt.UserDetailsImpl;
 import com.example.delivery.domain.reviews.dto.request.ReviewCreateRequest;
 import com.example.delivery.domain.reviews.dto.request.ReviewFindCondition;
 import com.example.delivery.domain.reviews.dto.request.ReviewUpdateRequest;
@@ -34,9 +36,10 @@ public class ReviewController {
 
 	@PostMapping
 	public ResponseEntity<ApiResponseDto<Long>> createReview(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@RequestBody ReviewCreateRequest dto
 	) {
-		ApiResponseDto<Long> apiResponseDto = reviewService.saveReview(1L, dto);
+		ApiResponseDto<Long> apiResponseDto = reviewService.saveReview(userDetails, dto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(apiResponseDto);
 	}
 

@@ -7,6 +7,20 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
+
+    // User
+	//400 BAD_REQUEST
+	INVALID_PASSWORD_FORMAT(HttpStatus.BAD_REQUEST, "비밀번호 형식이 올바르지 않습니다."),
+	PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "현재 비밀번호가 일치하지 않습니다."),
+	USER_NOT_SOFT_DELETED(HttpStatus.BAD_REQUEST, "소프트 삭제된 사용자만 하드 삭제할 수 있습니다."),
+
+	// 401 UNAUTHORIZED
+	SAME_AS_PASSWORD(HttpStatus.UNAUTHORIZED, "기존 비밀번호와 동일한 비밀번호는 사용할 수 없습니다"),
+	LOGOUT_FAILED(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
+
+	// 403 FORBIDDEN
+	UNAUTHORIZED_ROLE(HttpStatus.FORBIDDEN, "해당 작업을 수행할 권한이 없습니다."),
+
     // 400 - Bad Request (잘못된 요청)
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
     MISSING_PARAMETER(HttpStatus.BAD_REQUEST, "필수 파라미터가 누락되었습니다."),
