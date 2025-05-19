@@ -1,7 +1,9 @@
 package com.example.delivery.common.config;
 
+import com.example.delivery.common.exception.CustomAccessDeniedHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -25,6 +27,7 @@ public class SecurityConfig {
 
 	private final TokenProvider tokenProvider;
 	private final UserRepository userRepository;
+	private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
 	private static final String[] AUTH_WHITELIST = {
 		"/auth/signup", "/auth/login", "/users/{id}"
@@ -49,9 +52,16 @@ public class SecurityConfig {
 			UsernamePasswordAuthenticationFilter.class);
 
 		http.authorizeHttpRequests(auth -> auth
-			.requestMatchers(AUTH_WHITELIST).permitAll() // 비회원도 접근 가능한 경로, 인증 없이 접근 허용
-			.anyRequest().authenticated() // 그외 경로 : 반드시 인증 진행
+				.requestMatchers(HttpMethod.POST, "/stores").hasRole("OWNER")
+				.requestMatchers(HttpMethod.PATCH, "/stores/*").hasRole("OWNER")
+				.requestMatchers(HttpMethod.DELETE, "/stores/*").hasRole("OWNER")
+				.requestMatchers(HttpMethod.GET, "/stores/**").permitAll()
+				.requestMatchers(AUTH_WHITELIST).permitAll() // 비회원도 접근 가능한 경로, 인증 없이 접근 허용
+				.anyRequest().authenticated() // 그외 경로 : 반드시 인증 진행
 		);
+
+		http.exceptionHandling(exceptions -> exceptions
+				.accessDeniedHandler(customAccessDeniedHandler));
 
 		return http.build();
 	}
