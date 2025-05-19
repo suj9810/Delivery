@@ -44,14 +44,14 @@ public class StoreController {
 
     // 단건 조회
     @GetMapping("/{storeId}")
-    public ResponseEntity<ApiResponseDto<StoreResponseDto>> getStore (@PathVariable Long storeId) {
+    public ResponseEntity<ApiResponseDto<StoreResponseDto>> getStore (@PathVariable("storeId") Long storeId) {
         StoreResponseDto store = storeService.getStore(storeId);
-        return ResponseEntity.ok().body(ApiResponseDto.success(SuccessCode.OK, store));
+        return ResponseEntity.ok().body(ApiResponseDto.success(SuccessCode.STORE_FIND_SUCCESS, store));
     }
 
     @PatchMapping("/{storeId}")
     public ResponseEntity<ApiResponseDto<Void>> updateStore (
-            @PathVariable Long storeId,
+            @PathVariable("storeId") Long storeId,
             @RequestBody UpdateStoreRequestDto dto
     ) {
         storeService.updateStore(storeId, dto);
@@ -59,7 +59,7 @@ public class StoreController {
     }
 
     @DeleteMapping("/{storeId}")
-    public ResponseEntity<ApiResponseDto<Void>> deleteStore (@PathVariable Long storeId) {
+    public ResponseEntity<ApiResponseDto<Void>> deleteStore (@PathVariable("storeId") Long storeId) {
         storeService.deleteStore(storeId);
         return ResponseEntity.ok().body(ApiResponseDto.success(SuccessCode.STORE_CLOSED));
     }
