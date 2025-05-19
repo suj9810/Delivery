@@ -114,12 +114,12 @@ public class StoreService {
     }
     
     private Store findByIdOrElseThrow (Long storeId) {
-        return storeRepository.findById(storeId).orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
+        return storeRepository.findStoreAndUserById(storeId).orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
     }
 
     private void validateStoreOwner (Long userId, Store store) {
-        if (userId.equals(store.getUser().getId())) {
-            throw  new CustomException(ErrorCode.ONLY_OWNER_MANAGE_STORE);
+        if (!userId.equals(store.getUser().getId())) {
+            throw new CustomException(ErrorCode.ONLY_OWNER_MANAGE_STORE);
         }
     }
 }
