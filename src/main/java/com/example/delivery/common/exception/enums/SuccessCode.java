@@ -20,6 +20,7 @@ public enum SuccessCode {
     STORE_CREATED(HttpStatus.CREATED, "가게가 성공적으로 생성되었습니다."),
     STORE_UPDATED(HttpStatus.OK, "가게 정보가 성공적으로 수정되었습니다."),
     STORE_CLOSED(HttpStatus.OK, "가게가 성공적으로 적폐업 처리되었습니다."),
+    STORE_FIND_SUCCESS(HttpStatus.OK, "가게가 성공정적으로 조회되었습니다."),
     STORE_PAGING_SUCCESS(HttpStatus.OK, "가게 목록 조회가 되었습니다(페이징기반)"),
     STORE_PAGING_CURSOR_SUCCESS(HttpStatus.OK,"가게 목록 조회가 되었습니다(커서 기반 페이징)"),
 
