@@ -1,6 +1,8 @@
 package com.example.delivery.domain.reviews.entity;
 
 import com.example.delivery.common.entity.BaseTimeEntity;
+import com.example.delivery.common.exception.CustomException;
+import com.example.delivery.common.exception.enums.ErrorCode;
 import com.example.delivery.domain.user.entity.User;
 import com.example.delivery.domain.store.entity.Store;
 
@@ -47,10 +49,10 @@ public class Review extends BaseTimeEntity {
 		this.content = content;
 	}
 
-	// public void validateOwner(User user) {
-	// 	if (!user.getId().equals(this.getUser().getId())) {
-	// 		throw new ReviewException(ReviewExceptionCode.NOT_OWNER_OF_REVIEW);
-	// 	}
-	// }
+	public void validateOwner(User user) {
+		if (!user.getId().equals(this.getUser().getId())) {
+			throw new CustomException(ErrorCode.NO_PERMISSION);
+		}
+	}
 
 }

@@ -6,6 +6,8 @@ import lombok.*;
 
 import java.time.LocalTime;
 
+import com.example.delivery.domain.user.entity.User;
+
 @Getter
 @Entity
 @Table(name = "stores")
