@@ -6,6 +6,7 @@ import java.util.List;
 import com.example.delivery.domain.reviews.entity.Review;
 import com.example.delivery.domain.store.entity.Store;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.querydsl.core.annotations.QueryProjection;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReviewFindResponse {
 	private long reviewId;
@@ -25,14 +25,14 @@ public class ReviewFindResponse {
 	private LocalDateTime createdAt;
 	private LocalDateTime modifiedAt;
 
-	public static ReviewFindResponse from(Review review) {
-		return ReviewFindResponse.builder()
-			.reviewId(review.getId())
-			.storeId(review.getStore().getId())
-			.rating(review.getRating())
-			.content(review.getContent())
-			.createdAt(review.getCreatedAt())
-			.modifiedAt(review.getUpdatedAt())
-			.build();
+	@QueryProjection
+	public ReviewFindResponse(long reviewId, long storeId, int rating, String content, LocalDateTime createdAt,
+		LocalDateTime modifiedAt) {
+		this.reviewId = reviewId;
+		this.storeId = storeId;
+		this.rating = rating;
+		this.content = content;
+		this.createdAt = createdAt;
+		this.modifiedAt = modifiedAt;
 	}
 }

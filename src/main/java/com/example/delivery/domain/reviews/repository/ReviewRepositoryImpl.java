@@ -10,6 +10,8 @@ import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
 
 import com.example.delivery.domain.reviews.dto.request.ReviewFindCondition;
+import com.example.delivery.domain.reviews.dto.response.QReviewFindResponse;
+import com.example.delivery.domain.reviews.dto.response.ReviewFindResponse;
 import com.example.delivery.domain.reviews.entity.QReview;
 import com.example.delivery.domain.reviews.entity.Review;
 import com.querydsl.core.types.Predicate;
@@ -28,9 +30,17 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
 	}
 
 	@Override
-	public Page<Review> findReviewWithCondition(ReviewFindCondition condition, Pageable pageable) {
-		List<Review> content = queryFactory
-			.selectFrom(review)
+	public Page<ReviewFindResponse> findReviewWithCondition(ReviewFindCondition condition, Pageable pageable) {
+		List<ReviewFindResponse> content = queryFactory
+			.select(new QReviewFindResponse(
+				review.id,
+				review.store.id,
+				review.rating,
+				review.content,
+				review.createdAt,
+				review.updatedAt
+			))
+			.from(review)
 			.where(
 				review.store.id.eq(condition.getStoreId()),
 				minRating(condition.getMinRating()),

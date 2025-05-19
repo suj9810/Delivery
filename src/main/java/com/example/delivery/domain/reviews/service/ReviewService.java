@@ -1,7 +1,5 @@
 package com.example.delivery.domain.reviews.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -10,18 +8,17 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.delivery.common.exception.CustomException;
 import com.example.delivery.common.exception.enums.ErrorCode;
 import com.example.delivery.common.exception.enums.SuccessCode;
+import com.example.delivery.common.response.ApiPagingResponseDto;
 import com.example.delivery.common.response.ApiResponseDto;
 import com.example.delivery.domain.auth.jwt.UserDetailsImpl;
 import com.example.delivery.domain.reviews.dto.request.ReviewCreateRequest;
 import com.example.delivery.domain.reviews.dto.request.ReviewFindCondition;
 import com.example.delivery.domain.reviews.dto.request.ReviewUpdateRequest;
 import com.example.delivery.domain.reviews.dto.response.ReviewFindResponse;
-import com.example.delivery.domain.reviews.dto.response.ReviewPageResponse;
 import com.example.delivery.domain.reviews.entity.Review;
 import com.example.delivery.domain.reviews.repository.ReviewRepository;
 import com.example.delivery.domain.store.entity.Store;
 import com.example.delivery.domain.store.repository.StoreRepository;
-import com.example.delivery.domain.user.entity.User;
 
 import lombok.RequiredArgsConstructor;
 
@@ -49,22 +46,10 @@ public class ReviewService {
 		return ApiResponseDto.success(SuccessCode.REVIEW_CREATED, review.getId());
 	}
 
-	public ApiResponseDto<ReviewPageResponse> getReviews(ReviewFindCondition condition, Pageable pageable) {
-		Page<Review> page = reviewRepository.findReviewWithCondition(condition, pageable);
+	public ApiPagingResponseDto<ReviewFindResponse> getReviews(ReviewFindCondition condition, Pageable pageable) {
+		Page<ReviewFindResponse> page = reviewRepository.findReviewWithCondition(condition, pageable);
 
-        List<ReviewFindResponse> content = page.getContent().stream()
-            .map(ReviewFindResponse::from)
-            .toList();
-
-		ReviewPageResponse response = ReviewPageResponse.builder()
-			.totalElements(page.getTotalElements())
-			.totalPages(page.getTotalPages())
-			.hasNextPage(page.hasNext())
-			.hasPreviousPage(page.hasPrevious())
-			.content(content)
-			.build();
-
-		return ApiResponseDto.success(SuccessCode.REVIEW_SUCCESS_FIND, response);
+		return ApiPagingResponseDto.success(SuccessCode.REVIEW_SUCCESS_FIND, page);
 	}
 
 	@Transactional
