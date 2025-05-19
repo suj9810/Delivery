@@ -1,6 +1,7 @@
 package com.example.delivery.domain.menu.entity;
 
 import com.example.delivery.common.entity.BaseTimeEntity;
+import com.example.delivery.domain.store.entity.Store;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,9 +30,9 @@ public class Menu extends BaseTimeEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	// @ManyToOne(fetch = FetchType.LAZY)
-	// @JoinColumn(name = "store_id", nullable = false)
-	// private Store storeId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "store_id", nullable = false)
+	private Store store;
 
 	@Column(nullable = false, length = 100)
 	private String name;
