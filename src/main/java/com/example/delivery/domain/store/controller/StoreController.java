@@ -16,6 +16,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -37,7 +38,7 @@ public class StoreController {
     @GetMapping()
     public ResponseEntity<ApiResponseDto<StorePageResponse>> getStores (
             @PageableDefault(direction = Sort.Direction.ASC, sort = "createdAt") Pageable pageable,
-            @RequestParam String storeName
+            @Validated @RequestParam String storeName
     ) {
         StorePageResponse stores = storeService.getStores(pageable, storeName);
 
