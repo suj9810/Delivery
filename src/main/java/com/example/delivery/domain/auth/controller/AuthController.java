@@ -81,7 +81,7 @@ public class AuthController {
 		authService.deleteUser(userDetails.getUser(), requestDto);
 
 		return ResponseEntity.ok(
-			ApiResponseDto.success(SuccessCode.OK, null)
+			ApiResponseDto.success(SuccessCode.WITHDRAWAL_SUCCESS, null)
 		);
 	}
 

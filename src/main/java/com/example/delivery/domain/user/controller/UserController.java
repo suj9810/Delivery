@@ -38,7 +38,7 @@ public class UserController {
 	public ResponseEntity<ApiResponseDto<UserResponseDto>> getUserById(
 		@PathVariable Long id) {
 		UserResponseDto data = userService.getUserById(id);
-		return ResponseEntity.status(HttpStatus.OK).body(ApiResponseDto.success(SuccessCode.OK, data));
+		return ResponseEntity.status(HttpStatus.OK).body(ApiResponseDto.success(SuccessCode.USER_FETCH_SUCCESS, data));
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class UserController {
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
 		UserUpdateRequestDto updatedUser = userService.updateUserInfo(userDetails.getUser(), requestDto);
 
-		return ResponseEntity.ok(ApiResponseDto.success(SuccessCode.OK, updatedUser)
+		return ResponseEntity.ok(ApiResponseDto.success(SuccessCode.USER_UPDATE_SUCCESS, updatedUser)
 		);
 	}
 
@@ -69,7 +69,7 @@ public class UserController {
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
 
 		userService.updatePassword(userDetails.getUser(), requestDto);
-		return ResponseEntity.ok(ApiResponseDto.success(SuccessCode.OK, null)
+		return ResponseEntity.ok(ApiResponseDto.success(SuccessCode.PASSWORD_UPDATE_SUCCESS, null)
 		);
 	}
 

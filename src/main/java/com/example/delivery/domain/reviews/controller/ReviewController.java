@@ -48,24 +48,26 @@ public class ReviewController {
 		@ModelAttribute ReviewFindCondition condition,
 		@PageableDefault(size = 10, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
 	) {
-		ReviewPageResponse reviews = reviewService.getReviews(condition, pageable);
-		return ResponseEntity.status(HttpStatus.OK).body(ApiResponseDto.success(SuccessCode.OK, reviews));
+		ApiResponseDto<ReviewPageResponse> reviews = reviewService.getReviews(condition, pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(reviews);
 	}
 
 	@PutMapping("/{reviewId}")
 	public ResponseEntity<ApiResponseDto<Long>> updateReview(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@PathVariable("reviewId") Long reviewId,
 		@RequestBody ReviewUpdateRequest dto
 	) {
-		ApiResponseDto<Long> apiResponseDto = reviewService.updateReview(reviewId, dto);
+		ApiResponseDto<Long> apiResponseDto = reviewService.updateReview(userDetails, reviewId, dto);
 		return ResponseEntity.status(HttpStatus.OK).body(apiResponseDto);
 	}
 
 	@DeleteMapping("/{reviewId}")
 	public ResponseEntity<ApiResponseDto<Long>> delete(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@PathVariable("reviewId") Long reviewId
 	) {
-		ApiResponseDto<Long> apiResponseDto = reviewService.deleteReview(reviewId);
+		ApiResponseDto<Long> apiResponseDto = reviewService.deleteReview(userDetails, reviewId);
 		return ResponseEntity.status(HttpStatus.OK).body(apiResponseDto);
 	}
 
