@@ -2,6 +2,7 @@ package com.example.delivery.domain.store.controller;
 
 import com.example.delivery.common.exception.enums.SuccessCode;
 import com.example.delivery.common.response.ApiResponseDto;
+import com.example.delivery.domain.auth.jwt.UserDetailsImpl;
 import com.example.delivery.domain.store.dto.request.SaveStoreRequestDto;
 import com.example.delivery.domain.store.dto.request.UpdateStoreRequestDto;
 import com.example.delivery.domain.store.dto.response.SaveStoreResponseDto;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,9 +27,9 @@ public class StoreController {
 
     @PostMapping()
     public ResponseEntity<ApiResponseDto<SaveStoreResponseDto>> saveStore (
-            // userId 들어가야 함
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody SaveStoreRequestDto dto) {
-        SaveStoreResponseDto saveStoreResponseDto = storeService.saveStore(dto);
+        SaveStoreResponseDto saveStoreResponseDto = storeService.saveStore(userDetails, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDto.success(SuccessCode.STORE_CREATED, saveStoreResponseDto));
     }
 
@@ -35,7 +37,7 @@ public class StoreController {
     @GetMapping()
     public ResponseEntity<ApiResponseDto<StorePageResponse>> getStores (
             @PageableDefault(direction = Sort.Direction.ASC, sort = "createdAt") Pageable pageable,
-            @RequestParam(required = false) String storeName
+            @RequestParam String storeName
     ) {
         StorePageResponse stores = storeService.getStores(pageable, storeName);
 
@@ -51,16 +53,19 @@ public class StoreController {
 
     @PatchMapping("/{storeId}")
     public ResponseEntity<ApiResponseDto<Void>> updateStore (
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable("storeId") Long storeId,
             @RequestBody UpdateStoreRequestDto dto
     ) {
-        storeService.updateStore(storeId, dto);
+        storeService.updateStore(userDetails, storeId, dto);
         return ResponseEntity.ok().body(ApiResponseDto.success(SuccessCode.STORE_UPDATED));
     }
 
     @DeleteMapping("/{storeId}")
-    public ResponseEntity<ApiResponseDto<Void>> deleteStore (@PathVariable("storeId") Long storeId) {
-        storeService.deleteStore(storeId);
+    public ResponseEntity<ApiResponseDto<Void>> deleteStore (
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable("storeId") Long storeId) {
+        storeService.deleteStore(userDetails, storeId);
         return ResponseEntity.ok().body(ApiResponseDto.success(SuccessCode.STORE_CLOSED));
     }
 }
