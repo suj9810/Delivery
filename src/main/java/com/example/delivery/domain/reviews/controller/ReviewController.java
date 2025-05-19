@@ -63,7 +63,7 @@ public class ReviewController {
 		@PathVariable("reviewId") Long reviewId
 	) {
 		ApiResponseDto<Long> apiResponseDto = reviewService.deleteReview(reviewId);
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponseDto);
+		return ResponseEntity.status(HttpStatus.OK).body(apiResponseDto);
 	}
 
 }
