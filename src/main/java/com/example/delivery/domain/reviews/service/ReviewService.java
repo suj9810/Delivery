@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.delivery.common.exception.enums.SuccessCode;
 import com.example.delivery.common.response.ApiResponseDto;
+import com.example.delivery.domain.auth.jwt.UserDetailsImpl;
 import com.example.delivery.domain.reviews.dto.request.ReviewCreateRequest;
 import com.example.delivery.domain.reviews.dto.request.ReviewFindCondition;
 import com.example.delivery.domain.reviews.dto.request.ReviewUpdateRequest;
@@ -30,16 +31,12 @@ public class ReviewService {
 	private final com.example.delivery.domain.user.repository.UserRepository userRepository;
 	private final StoreRepository storeRepository;
 
-	public ApiResponseDto<Long> saveReview(Long userId, ReviewCreateRequest dto) {
-
-		// 시큐리티 사용할것
-		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new RuntimeException());
+	public ApiResponseDto<Long> saveReview(UserDetailsImpl userDetails, ReviewCreateRequest dto) {
 
 		Store store = storeRepository.findById(dto.getStoreId()).orElseThrow(() -> new RuntimeException());
 
 		Review review = Review.builder()
-			.user(user)
+			.user(userDetails.getUser())
 			.rating(dto.getRating())
 			.content(dto.getContent())
 			.store(store)
