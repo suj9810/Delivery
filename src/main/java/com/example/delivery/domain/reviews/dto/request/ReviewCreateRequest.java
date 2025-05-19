@@ -1,0 +1,17 @@
+package com.example.delivery.domain.reviews.dto.request;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@AllArgsConstructor
+public class ReviewCreateRequest {
+
+	private String content;
+
+	private Integer rating;
+
+	private Long storeId;
+}
