@@ -15,6 +15,9 @@ public enum SuccessCode {
     LOGIN_SUCCESS(HttpStatus.OK, "로그인에 성공하였습니다."),
     LOGOUT_SUCCESS(HttpStatus.OK, "로그아웃에 성공하였습니다."),
     WITHDRAWAL_SUCCESS(HttpStatus.OK, "회원 탈퇴가 정상적으로 처리되었습니다."),
+    USER_FETCH_SUCCESS(HttpStatus.OK, "회원 정보를 성공적으로 조회했습니다."),
+    USER_UPDATE_SUCCESS(HttpStatus.OK, "회원 정보를 성공적으로 수정하였습니다."),
+    PASSWORD_UPDATE_SUCCESS(HttpStatus.OK, "비밀번호를 성공적으로 수정하였습니다."),
 
     // 가게 관련
     STORE_CREATED(HttpStatus.CREATED, "가게가 성공적으로 생성되었습니다."),
@@ -36,6 +39,7 @@ public enum SuccessCode {
 
     // 리뷰 관련
     REVIEW_CREATED(HttpStatus.CREATED, "리뷰가 성공적으로 등록되었습니다."),
+    REVIEW_SUCCESS_FIND(HttpStatus.OK, "리뷰를 성공적으로 조회하였습니다."),
     REVIEW_UPDATED(HttpStatus.OK, "리뷰가 성공적으로 수정되었습니다."),
     REVIEW_DELETED(HttpStatus.OK, "리뷰가 성공적으로 삭제되었습니다.");
 

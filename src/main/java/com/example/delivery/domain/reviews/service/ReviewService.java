@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.delivery.common.exception.CustomException;
+import com.example.delivery.common.exception.enums.ErrorCode;
 import com.example.delivery.common.exception.enums.SuccessCode;
 import com.example.delivery.common.response.ApiResponseDto;
 import com.example.delivery.domain.auth.jwt.UserDetailsImpl;
@@ -33,7 +35,8 @@ public class ReviewService {
 
 	public ApiResponseDto<Long> saveReview(UserDetailsImpl userDetails, ReviewCreateRequest dto) {
 
-		Store store = storeRepository.findById(dto.getStoreId()).orElseThrow(() -> new RuntimeException());
+		Store store = storeRepository.findById(dto.getStoreId()).orElseThrow(() -> new CustomException(
+			ErrorCode.STORE_NOT_FOUND));
 
 		Review review = Review.builder()
 			.user(userDetails.getUser())
@@ -43,34 +46,43 @@ public class ReviewService {
 			.build();
 
 		reviewRepository.save(review);
-		return ApiResponseDto.success(SuccessCode.OK, review.getId());
+		return ApiResponseDto.success(SuccessCode.REVIEW_CREATED, review.getId());
 	}
 
-	public ReviewPageResponse getReviews(ReviewFindCondition condition, Pageable pageable) {
+	public ApiResponseDto<ReviewPageResponse> getReviews(ReviewFindCondition condition, Pageable pageable) {
 		Page<Review> page = reviewRepository.findReviewWithCondition(condition, pageable);
 
         List<ReviewFindResponse> content = page.getContent().stream()
             .map(ReviewFindResponse::from)
             .toList();
 
-        return ReviewPageResponse.builder()
-            .totalElements(page.getTotalElements())
-            .totalPages(page.getTotalPages())
-            .hasNextPage(page.hasNext())
-            .hasPreviousPage(page.hasPrevious())
-            .content(content)
-            .build();
+		ReviewPageResponse response = ReviewPageResponse.builder()
+			.totalElements(page.getTotalElements())
+			.totalPages(page.getTotalPages())
+			.hasNextPage(page.hasNext())
+			.hasPreviousPage(page.hasPrevious())
+			.content(content)
+			.build();
+
+		return ApiResponseDto.success(SuccessCode.REVIEW_SUCCESS_FIND, response);
 	}
 
 	@Transactional
-	public ApiResponseDto<Long> updateReview(Long reviewId, ReviewUpdateRequest dto) {
-		Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new RuntimeException());
+	public ApiResponseDto<Long> updateReview(UserDetailsImpl user, Long reviewId, ReviewUpdateRequest dto) {
+		Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
+
+		review.validateOwner(user.getUser());
+
 		review.update(dto.getContent());
-		return ApiResponseDto.success(SuccessCode.OK, review.getId());
+		return ApiResponseDto.success(SuccessCode.REVIEW_UPDATED, review.getId());
 	}
 
-	public ApiResponseDto<Long> deleteReview(Long reviewId) {
-		Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new RuntimeException());
+	@Transactional
+	public ApiResponseDto<Long> deleteReview(UserDetailsImpl user, Long reviewId) {
+		Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
+
+		review.validateOwner(user.getUser());
+
 		reviewRepository.delete(review);
 		return ApiResponseDto.success(SuccessCode.REVIEW_DELETED);
 	}
