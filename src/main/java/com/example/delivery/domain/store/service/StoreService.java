@@ -55,10 +55,6 @@ public class StoreService {
 
     public StorePageResponse getStores(Pageable pageable, String storeName) {
 
-        if (storeName == null) {
-            throw new CustomException(ErrorCode.MISSING_PARAMETER);
-        }
-
         Page<StoreIdAndNameResponseDto> stores = storeRepository.findStoreIdAndStoreNameByStoreName(pageable, storeName);
 
         List<StoreIdAndNameResponseDto> content = stores.getContent();
