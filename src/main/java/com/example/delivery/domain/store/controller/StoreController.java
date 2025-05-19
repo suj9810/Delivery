@@ -1,12 +1,13 @@
 package com.example.delivery.domain.store.controller;
 
 import com.example.delivery.common.exception.enums.SuccessCode;
+import com.example.delivery.common.response.ApiPagingResponseDto;
 import com.example.delivery.common.response.ApiResponseDto;
 import com.example.delivery.domain.auth.jwt.UserDetailsImpl;
 import com.example.delivery.domain.store.dto.request.SaveStoreRequestDto;
 import com.example.delivery.domain.store.dto.request.UpdateStoreRequestDto;
 import com.example.delivery.domain.store.dto.response.SaveStoreResponseDto;
-import com.example.delivery.domain.store.dto.response.StorePageResponse;
+import com.example.delivery.domain.store.dto.response.StoreIdAndNameResponseDto;
 import com.example.delivery.domain.store.dto.response.StoreResponseDto;
 import com.example.delivery.domain.store.service.StoreService;
 import lombok.RequiredArgsConstructor;
@@ -36,13 +37,13 @@ public class StoreController {
 
     // 전체 조회(가게명이 들어간 단어로 검색)
     @GetMapping()
-    public ResponseEntity<ApiResponseDto<StorePageResponse>> getStores (
-            @PageableDefault(direction = Sort.Direction.ASC, sort = "createdAt") Pageable pageable,
+    public ResponseEntity<ApiPagingResponseDto<StoreIdAndNameResponseDto>> getStores (
+            @PageableDefault(direction = Sort.Direction.DESC, sort = "createdAt") Pageable pageable,
             @Validated @RequestParam String storeName
     ) {
-        StorePageResponse stores = storeService.getStores(pageable, storeName);
+        ApiPagingResponseDto<StoreIdAndNameResponseDto> stores = storeService.getStores(pageable, storeName);
 
-        return ResponseEntity.ok().body(ApiResponseDto.success(SuccessCode.STORE_PAGING_SUCCESS, stores));
+        return ResponseEntity.ok().body(stores);
     }
 
     // 단건 조회
