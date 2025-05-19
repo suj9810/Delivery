@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.delivery.common.exception.enums.SuccessCode;
+import com.example.delivery.common.response.ApiPagingResponseDto;
 import com.example.delivery.common.response.ApiResponseDto;
 import com.example.delivery.domain.auth.jwt.UserDetailsImpl;
 import com.example.delivery.domain.reviews.dto.request.ReviewCreateRequest;
 import com.example.delivery.domain.reviews.dto.request.ReviewFindCondition;
 import com.example.delivery.domain.reviews.dto.request.ReviewUpdateRequest;
-import com.example.delivery.domain.reviews.dto.response.ReviewPageResponse;
+import com.example.delivery.domain.reviews.dto.response.ReviewFindResponse;
 import com.example.delivery.domain.reviews.service.ReviewService;
 
 import lombok.RequiredArgsConstructor;
@@ -44,11 +44,11 @@ public class ReviewController {
 	}
 
 	@GetMapping
-	public ResponseEntity<ApiResponseDto<ReviewPageResponse>> findReview(
+	public ResponseEntity<ApiPagingResponseDto<ReviewFindResponse>> findReview(
 		@ModelAttribute ReviewFindCondition condition,
 		@PageableDefault(size = 10, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
 	) {
-		ApiResponseDto<ReviewPageResponse> reviews = reviewService.getReviews(condition, pageable);
+		ApiPagingResponseDto<ReviewFindResponse> reviews = reviewService.getReviews(condition, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(reviews);
 	}
 
