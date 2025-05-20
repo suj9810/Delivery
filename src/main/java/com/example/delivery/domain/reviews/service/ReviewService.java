@@ -19,6 +19,7 @@ import com.example.delivery.domain.reviews.entity.Review;
 import com.example.delivery.domain.reviews.repository.ReviewRepository;
 import com.example.delivery.domain.store.entity.Store;
 import com.example.delivery.domain.store.repository.StoreRepository;
+import com.example.delivery.domain.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,13 +28,11 @@ import lombok.RequiredArgsConstructor;
 public class ReviewService {
 
 	private final ReviewRepository reviewRepository;
-	private final com.example.delivery.domain.user.repository.UserRepository userRepository;
+	private final UserRepository userRepository;
 	private final StoreRepository storeRepository;
 
-	public ApiResponseDto<Long> saveReview(UserDetailsImpl userDetails, ReviewCreateRequest dto) {
-
-		Store store = storeRepository.findById(dto.getStoreId()).orElseThrow(() -> new CustomException(
-			ErrorCode.STORE_NOT_FOUND));
+	public Long saveReview(UserDetailsImpl userDetails, ReviewCreateRequest dto) {
+		Store store = storeRepository.findById(dto.getStoreId()).orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 
 		Review review = Review.builder()
 			.user(userDetails.getUser())
@@ -43,32 +42,31 @@ public class ReviewService {
 			.build();
 
 		reviewRepository.save(review);
-		return ApiResponseDto.success(SuccessCode.REVIEW_CREATED, review.getId());
+		return review.getId();
 	}
 
-	public ApiPagingResponseDto<ReviewFindResponse> getReviews(ReviewFindCondition condition, Pageable pageable) {
+	public Page<ReviewFindResponse> getReviews(ReviewFindCondition condition, Pageable pageable) {
 		Page<ReviewFindResponse> page = reviewRepository.findReviewWithCondition(condition, pageable);
 
-		return ApiPagingResponseDto.success(SuccessCode.REVIEW_SUCCESS_FIND, page);
+		return page;
 	}
 
 	@Transactional
-	public ApiResponseDto<Long> updateReview(UserDetailsImpl user, Long reviewId, ReviewUpdateRequest dto) {
+	public Long updateReview(UserDetailsImpl user, Long reviewId, ReviewUpdateRequest dto) {
 		Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 
 		review.validateOwner(user.getUser());
 
 		review.update(dto.getContent());
-		return ApiResponseDto.success(SuccessCode.REVIEW_UPDATED, review.getId());
+		return review.getId();
 	}
 
 	@Transactional
-	public ApiResponseDto<Long> deleteReview(UserDetailsImpl user, Long reviewId) {
+	public void deleteReview(UserDetailsImpl user, Long reviewId) {
 		Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 
 		review.validateOwner(user.getUser());
 
 		reviewRepository.delete(review);
-		return ApiResponseDto.success(SuccessCode.REVIEW_DELETED);
 	}
 }

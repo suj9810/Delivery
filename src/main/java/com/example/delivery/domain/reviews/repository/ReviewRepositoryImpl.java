@@ -1,5 +1,7 @@
 package com.example.delivery.domain.reviews.repository;
 
+// import static com.example.delivery.domain.reviews.entity.QReview.*;
+
 import static com.example.delivery.domain.reviews.entity.QReview.*;
 
 import java.util.List;
@@ -7,27 +9,23 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
-import org.springframework.util.StringUtils;
 
 import com.example.delivery.domain.reviews.dto.request.ReviewFindCondition;
 import com.example.delivery.domain.reviews.dto.response.QReviewFindResponse;
 import com.example.delivery.domain.reviews.dto.response.ReviewFindResponse;
 import com.example.delivery.domain.reviews.entity.QReview;
 import com.example.delivery.domain.reviews.entity.Review;
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
 
 	private final JPAQueryFactory queryFactory;
-
-	public ReviewRepositoryImpl(EntityManager em) {
-		this.queryFactory = new JPAQueryFactory(em);
-	}
 
 	@Override
 	public Page<ReviewFindResponse> findReviewWithCondition(ReviewFindCondition condition, Pageable pageable) {
