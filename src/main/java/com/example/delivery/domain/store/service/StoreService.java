@@ -12,10 +12,12 @@ import com.example.delivery.domain.store.entity.Store;
 import com.example.delivery.domain.store.repository.StoreRepository;
 import com.example.delivery.domain.user.entity.User;
 import com.example.delivery.domain.user.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public SaveStoreResponseDto saveStore(UserDetailsImpl userDetails, SaveStoreRequestDto dto) {
         
         User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -50,12 +53,13 @@ public class StoreService {
                 savedStore.getClosedTime());
     }
 
+    @Transactional(readOnly = true)
     public Page<StoreIdAndNameResponseDto> getStores(Pageable pageable, String storeName) {
 
         return storeRepository.findStoreIdAndStoreNameByStoreName(pageable, storeName);
     }
 
-
+    @Transactional(readOnly = true)
     public StoreResponseDto getStore(Long storeId) {
         
         Store store = findByIdOrElseThrow(storeId);
@@ -71,6 +75,7 @@ public class StoreService {
         );
     }
 
+    @Transactional
     public void updateStore(UserDetailsImpl userDetails, Long storeId, UpdateStoreRequestDto dto) {
 
         Store store = findByIdOrElseThrow(storeId);
@@ -87,6 +92,7 @@ public class StoreService {
         );
     }
 
+    @Transactional
     public void deleteStore(UserDetailsImpl userDetails, Long storeId) {
 
         Store store = findByIdOrElseThrow(storeId);
