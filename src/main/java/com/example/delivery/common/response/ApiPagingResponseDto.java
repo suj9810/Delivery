@@ -12,9 +12,9 @@ import lombok.Getter;
 @Getter
 @Builder
 public class ApiPagingResponseDto<T> {
-	private int statusCode;
-	private String message;
-	private Data<T> data;
+	private final int statusCode;
+	private final String message;
+	private final Data<T> data;
 
 	@Getter
 	@Builder
