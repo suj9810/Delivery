@@ -49,12 +49,7 @@ public class MenuService {
 			.build();
 		menuRepository.save(menu);
 
-		return MenuResponse.builder()
-			.id(menu.getId())
-			.name(menu.getName())
-			.description(menu.getDescription())
-			.price(menu.getPrice())
-			.build();
+		return MenuResponse.of(menu);
 	}
 
 	/**
@@ -67,16 +62,10 @@ public class MenuService {
 	 */
 	@Transactional
 	public MenuResponse updateMenu(Long loginUserid, Long menuId, MenuUpdateRequest request) {
-		Menu menu = findMenu(menuId, loginUserid);
-
+		Menu menu = findMenuWithStoreAndUser(menuId);
+		validOwner(menu.getStore().getUser().getId(), loginUserid);
 		menu.updateMenu(request);
-
-		return MenuResponse.builder()
-			.id(menu.getId())
-			.name(menu.getName())
-			.description(menu.getDescription())
-			.price(menu.getPrice())
-			.build();
+		return MenuResponse.of(menu);
 	}
 
 	/**
@@ -88,22 +77,19 @@ public class MenuService {
 	 */
 	@Transactional
 	public void deleteMenu(Long loginUserid, Long menuId) {
-		Menu menu = findMenu(menuId, loginUserid);
-
+		Menu menu = findMenuWithStoreAndUser(menuId);
+		validOwner(menu.getStore().getUser().getId(), loginUserid);
 		menuRepository.delete(menu);
 	}
 
 	/**
 	 * 메뉴 ID 검증
 	 * @param menuId
-	 * @param loginUserId
 	 * @return
 	 */
-	private Menu findMenu(Long menuId, Long loginUserId) {
-		Menu menu = menuRepository.findById(menuId)
+	private Menu findMenuWithStoreAndUser(Long menuId) {
+		return menuRepository.findMenuById(menuId)
 			.orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
-		validOwner(menu.getStore().getUser().getId(), loginUserId);
-		return menu;
 	}
 
 	/**
