@@ -12,7 +12,7 @@ import com.example.delivery.domain.menu.entity.Menu;
  * Menu Repository
  */
 @Repository
-public interface MenuRepository extends JpaRepository <Menu, Long> {
+public interface MenuRepository extends JpaRepository <Menu, Long>, MenuRepositoryCustom {
 	@EntityGraph(attributePaths = {"store", "store.user"})
 	Optional<Menu> findMenuById(Long menuId);
 }

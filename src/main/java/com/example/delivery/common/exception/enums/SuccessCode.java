@@ -30,6 +30,7 @@ public enum SuccessCode {
     // 메뉴 관련
     MENU_CREATED(HttpStatus.CREATED, "메뉴가 성공적으로 등록되었습니다."),
     MENU_UPDATED(HttpStatus.OK, "메뉴가 성공적으로 수정되었습니다."),
+    MENU_PAGING_SUCCESS(HttpStatus.OK, "메뉴 목록 조회가 되었습니다(페이징기반)"),
     MENU_DELETED(HttpStatus.OK, "메뉴가 성공적으로 삭제되었습니다."),
 
     // 주문 관련
