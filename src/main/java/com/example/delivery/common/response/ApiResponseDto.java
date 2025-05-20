@@ -7,10 +7,9 @@ import com.example.delivery.common.exception.enums.SuccessCode;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import io.micrometer.common.lang.Nullable;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
-import org.antlr.v4.runtime.misc.NotNull;
-import org.springframework.data.domain.Page;
 
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @Builder
