@@ -35,7 +35,7 @@ public class MenuService {
 	 * @return the api response dto
 	 */
 	@Transactional
-	public ApiResponseDto<MenuResponse> createMenu(Long loginUserId, MenuCreatRequest request) {
+	public MenuResponse createMenu(Long loginUserId, MenuCreatRequest request) {
 		Store store = storeRepository.findById(request.getStoreId())
 			.orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 
@@ -49,14 +49,12 @@ public class MenuService {
 			.build();
 		menuRepository.save(menu);
 
-		MenuResponse response = MenuResponse.builder()
+		return MenuResponse.builder()
 			.id(menu.getId())
 			.name(menu.getName())
 			.description(menu.getDescription())
 			.price(menu.getPrice())
 			.build();
-
-		return ApiResponseDto.success(SuccessCode.MENU_CREATED, response);
 	}
 
 	/**
@@ -68,19 +66,17 @@ public class MenuService {
 	 * @return the api response dto
 	 */
 	@Transactional
-	public ApiResponseDto<MenuResponse> updateMenu(Long loginUserid, Long menuId, MenuUpdateRequest request) {
+	public MenuResponse updateMenu(Long loginUserid, Long menuId, MenuUpdateRequest request) {
 		Menu menu = findMenu(menuId, loginUserid);
 
 		menu.updateMenu(request);
 
-		MenuResponse response = MenuResponse.builder()
+		return MenuResponse.builder()
 			.id(menu.getId())
 			.name(menu.getName())
 			.description(menu.getDescription())
 			.price(menu.getPrice())
 			.build();
-
-		return ApiResponseDto.success(SuccessCode.MENU_UPDATED, response);
 	}
 
 	/**
@@ -91,11 +87,10 @@ public class MenuService {
 	 * @return the api response dto
 	 */
 	@Transactional
-	public ApiResponseDto<MenuResponse> deleteMenu(Long loginUserid, Long menuId) {
+	public void deleteMenu(Long loginUserid, Long menuId) {
 		Menu menu = findMenu(menuId, loginUserid);
 
 		menuRepository.delete(menu);
-		return ApiResponseDto.success(SuccessCode.MENU_DELETED);
 	}
 
 	/**
