@@ -2,12 +2,13 @@ package com.example.delivery.domain.store.service;
 
 import com.example.delivery.common.exception.CustomException;
 import com.example.delivery.common.exception.enums.ErrorCode;
+import com.example.delivery.common.exception.enums.SuccessCode;
+import com.example.delivery.common.response.ApiPagingResponseDto;
 import com.example.delivery.domain.auth.jwt.UserDetailsImpl;
 import com.example.delivery.domain.store.dto.request.SaveStoreRequestDto;
 import com.example.delivery.domain.store.dto.request.UpdateStoreRequestDto;
 import com.example.delivery.domain.store.dto.response.SaveStoreResponseDto;
 import com.example.delivery.domain.store.dto.response.StoreIdAndNameResponseDto;
-import com.example.delivery.domain.store.dto.response.StorePageResponse;
 import com.example.delivery.domain.store.dto.response.StoreResponseDto;
 import com.example.delivery.domain.store.entity.Store;
 import com.example.delivery.domain.store.repository.StoreRepository;
@@ -17,8 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -53,19 +52,11 @@ public class StoreService {
                 savedStore.getClosedTime());
     }
 
-    public StorePageResponse getStores(Pageable pageable, String storeName) {
+    public ApiPagingResponseDto<StoreIdAndNameResponseDto> getStores(Pageable pageable, String storeName) {
 
         Page<StoreIdAndNameResponseDto> stores = storeRepository.findStoreIdAndStoreNameByStoreName(pageable, storeName);
 
-        List<StoreIdAndNameResponseDto> content = stores.getContent();
-
-        return StorePageResponse.builder()
-                .totalElements(stores.getTotalElements())
-                .totalPages(stores.getTotalPages())
-                .hasNextPage(stores.hasNext())
-                .hasPreviousPage(stores.hasPrevious())
-                .content(content)
-                .build();
+        return ApiPagingResponseDto.success(SuccessCode.STORE_PAGING_SUCCESS, stores);
     }
 
 
