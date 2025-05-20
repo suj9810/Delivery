@@ -27,6 +27,13 @@ public class MenuService {
 	private final MenuRepository menuRepository;
 	private final StoreRepository storeRepository;
 
+	/**
+	 * 메뉴 생성
+	 *
+	 * @param loginUserId the login user id 
+	 * @param request the request 
+	 * @return the api response dto
+	 */
 	@Transactional
 	public ApiResponseDto<MenuResponse> createMenu(Long loginUserId, MenuCreatRequest request) {
 		Store store = storeRepository.findById(request.getStoreId())
@@ -52,6 +59,14 @@ public class MenuService {
 		return ApiResponseDto.success(SuccessCode.MENU_CREATED, response);
 	}
 
+	/**
+	 * 메뉴 수정
+	 *
+	 * @param loginUserid the login userid 
+	 * @param menuId the menu id 
+	 * @param request the request 
+	 * @return the api response dto
+	 */
 	@Transactional
 	public ApiResponseDto<MenuResponse> updateMenu(Long loginUserid, Long menuId, MenuUpdateRequest request) {
 		Menu menu = findMenu(menuId, loginUserid);
@@ -68,6 +83,27 @@ public class MenuService {
 		return ApiResponseDto.success(SuccessCode.MENU_UPDATED, response);
 	}
 
+	/**
+	 * 메뉴 삭제
+	 *
+	 * @param loginUserid the login userid 
+	 * @param menuId the menu id 
+	 * @return the api response dto
+	 */
+	@Transactional
+	public ApiResponseDto<MenuResponse> deleteMenu(Long loginUserid, Long menuId) {
+		Menu menu = findMenu(menuId, loginUserid);
+
+		menuRepository.delete(menu);
+		return ApiResponseDto.success(SuccessCode.MENU_DELETED);
+	}
+
+	/**
+	 * 메뉴 ID 검증
+	 * @param menuId
+	 * @param loginUserId
+	 * @return
+	 */
 	private Menu findMenu(Long menuId, Long loginUserId) {
 		Menu menu = menuRepository.findById(menuId)
 			.orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
@@ -75,14 +111,16 @@ public class MenuService {
 		return menu;
 	}
 
-	private Menu findIdOrElseThrow(Long menuId) {
-		return menuRepository.findById(menuId)
-			.orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
-	}
-
+	/**
+	 * 오너 ID, 로그인 ID 검증
+	 * @param ownerId
+	 * @param loginUserId
+	 */
 	private void validOwner(Long ownerId, Long loginUserId) {
 		if (!ownerId.equals(loginUserId)) {
 			throw new CustomException(ErrorCode.OWNER_PERMISSION_REQUIRED);
 		}
 	}
+
+
 }

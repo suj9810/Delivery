@@ -3,6 +3,7 @@ package com.example.delivery.domain.menu.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -37,7 +38,7 @@ public class MenuController {
 	 * @return the response entity
 	 */
 	@PostMapping
-	public ResponseEntity<ApiResponseDto<MenuResponse>> createMenu(
+	public ResponseEntity<ApiResponseDto<MenuResponse>> createMenu (
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@RequestBody MenuCreatRequest request
 	) {
@@ -54,12 +55,28 @@ public class MenuController {
 	 * @return the response entity
 	 */
 	@PutMapping("/{menuId}")
-	public ResponseEntity<ApiResponseDto<MenuResponse>> updateMenu(
+	public ResponseEntity<ApiResponseDto<MenuResponse>> updateMenu (
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@PathVariable Long menuId,
 		@RequestBody MenuUpdateRequest request
 	) {
 		ApiResponseDto<MenuResponse> response = menuService.updateMenu(userDetails.getUser().getId(), menuId, request);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
+	/**
+	 * 메뉴 삭제
+	 *
+	 * @param userDetails the user details 
+	 * @param menuId the menu id 
+	 * @return the response entity
+	 */
+	@DeleteMapping("/{menuId}")
+	public ResponseEntity<ApiResponseDto<MenuResponse>> deleteMenu (
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PathVariable Long menuId
+	) {
+		menuService.deleteMenu(userDetails.getUser().getId(), menuId);
+		return ResponseEntity.status(HttpStatus.OK).body(ApiResponseDto.success(null));
 	}
 }
