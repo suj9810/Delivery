@@ -7,26 +7,36 @@ import com.example.delivery.common.exception.enums.SuccessCode;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import io.micrometer.common.lang.Nullable;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @Builder
-public record ApiResponseDto<T>(
-	int statusCode,                                 // HTTP 상태 코드 숫자 (예: 400)
-	@NotNull String message,                        // 응답 메시지 (ex: "가게 생성 성공", "잘못된 요청입니다")
-	T data                                          // 실제 응답 데이터 (nullable), null이면 JSON에서 제외됨
-) {
+public class ApiResponseDto<T> extends ResponseEntity<T> {
 
-	// 성공응답 Data있음
+	// HTTP 상태 코드 숫자 (예: 400)
+	int statusCode;
+
+	@NotNull
+	// 응답 메시지 (ex: "가게 생성 성공", "잘못된 요청입니다")
+	String message;
+
+	// 실제 응답 데이터 (nullable), null이면 JSON에서 제외됨
+	T data;
+
+	/**
+	 * 성공응답 Data있음
+	 * @param successCode 성공 상태코드/메시지 Enum
+	 * @param data data
+	 * @return ApiResponseDto
+	 */
 	public static <T> ApiResponseDto<T> success(final SuccessCode successCode, @Nullable final T data) {
-		return new ApiResponseDto<>(
-			successCode.getHttpStatus().value(),
-			successCode.getMessage(),
-			data
-		);
+		return new ApiResponseDto<>(successCode.getHttpStatus().value(), successCode.getMessage(), data);
 	}
 
 	/**
@@ -45,11 +55,7 @@ public record ApiResponseDto<T>(
 	 * @return ApiResponseDto
 	 */
 	public static <T> ApiResponseDto<T> fail(final ErrorCode errorCode) {
-		return new ApiResponseDto<>(
-			errorCode.getHttpStatus().value(),
-			errorCode.getMessage(),
-			null
-		);
+		return new ApiResponseDto<>(errorCode.getHttpStatus().value(), errorCode.getMessage(), null);
 	}
 
 	/**
@@ -57,10 +63,6 @@ public record ApiResponseDto<T>(
 	 * @return ApiResponseDto
 	 */
 	public static <T> ApiResponseDto<T> fail(final ErrorCode errorCode, final String message) {
-		return new ApiResponseDto<>(
-			errorCode.getHttpStatus().value(),
-			message,
-			null
-		);
+		return new ApiResponseDto<>(errorCode.getHttpStatus().value(), message, null);
 	}
 }

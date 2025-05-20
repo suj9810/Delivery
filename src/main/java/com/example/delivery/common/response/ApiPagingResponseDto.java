@@ -3,6 +3,7 @@ package com.example.delivery.common.response;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 
 import com.example.delivery.common.exception.enums.SuccessCode;
 
@@ -11,7 +12,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ApiPagingResponseDto<T> {
+public class ApiPagingResponseDto<T> extends ResponseEntity<T> {
 	private int statusCode;
 	private String message;
 	private Data<T> data;
