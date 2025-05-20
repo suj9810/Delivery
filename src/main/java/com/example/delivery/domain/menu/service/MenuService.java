@@ -8,6 +8,7 @@ import com.example.delivery.common.exception.enums.ErrorCode;
 import com.example.delivery.common.exception.enums.SuccessCode;
 import com.example.delivery.common.response.ApiResponseDto;
 import com.example.delivery.domain.menu.dto.request.MenuCreatRequest;
+import com.example.delivery.domain.menu.dto.request.MenuUpdateRequest;
 import com.example.delivery.domain.menu.dto.response.MenuResponse;
 import com.example.delivery.domain.menu.entity.Menu;
 import com.example.delivery.domain.menu.repository.MenuRepository;
@@ -51,17 +52,33 @@ public class MenuService {
 		return ApiResponseDto.success(SuccessCode.MENU_CREATED, response);
 	}
 
-	// private Menu findMenu(Long menuId, Long loginUserId) {
-	// 	Menu menu = menuRepository.findById(menuId)
-	// 		.orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
-	// 	validOwner(menu.getStore().getUser().getId(), loginUserId);
-	// 	return menu;
-	// }
+	@Transactional
+	public ApiResponseDto<MenuResponse> updateMenu(Long loginUserid, Long menuId, MenuUpdateRequest request) {
+		Menu menu = findMenu(menuId, loginUserid);
 
-	// private Menu findIdOrElseThrow(Long menuId) {
-	// 	return menuRepository.findById(menuId)
-	// 		.orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
-	// }
+		menu.updateMenu(request);
+
+		MenuResponse response = MenuResponse.builder()
+			.id(menu.getId())
+			.name(menu.getName())
+			.description(menu.getDescription())
+			.price(menu.getPrice())
+			.build();
+
+		return ApiResponseDto.success(SuccessCode.MENU_UPDATED, response);
+	}
+
+	private Menu findMenu(Long menuId, Long loginUserId) {
+		Menu menu = menuRepository.findById(menuId)
+			.orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
+		validOwner(menu.getStore().getUser().getId(), loginUserId);
+		return menu;
+	}
+
+	private Menu findIdOrElseThrow(Long menuId) {
+		return menuRepository.findById(menuId)
+			.orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
+	}
 
 	private void validOwner(Long ownerId, Long loginUserId) {
 		if (!ownerId.equals(loginUserId)) {

@@ -1,6 +1,7 @@
 package com.example.delivery.domain.menu.entity;
 
 import com.example.delivery.common.entity.BaseTimeEntity;
+import com.example.delivery.domain.menu.dto.request.MenuUpdateRequest;
 import com.example.delivery.domain.store.entity.Store;
 
 import jakarta.persistence.Column;
@@ -42,4 +43,10 @@ public class Menu extends BaseTimeEntity {
 
 	@Column(nullable = false)
 	private int price;
+
+	public void updateMenu(MenuUpdateRequest request) {
+		this.name = name;
+		this.description = description;
+		this.price = price;
+	}
 }
