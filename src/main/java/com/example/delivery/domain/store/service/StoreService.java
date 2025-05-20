@@ -2,8 +2,6 @@ package com.example.delivery.domain.store.service;
 
 import com.example.delivery.common.exception.CustomException;
 import com.example.delivery.common.exception.enums.ErrorCode;
-import com.example.delivery.common.exception.enums.SuccessCode;
-import com.example.delivery.common.response.ApiPagingResponseDto;
 import com.example.delivery.domain.auth.jwt.UserDetailsImpl;
 import com.example.delivery.domain.store.dto.request.SaveStoreRequestDto;
 import com.example.delivery.domain.store.dto.request.UpdateStoreRequestDto;
@@ -52,11 +50,9 @@ public class StoreService {
                 savedStore.getClosedTime());
     }
 
-    public ApiPagingResponseDto<StoreIdAndNameResponseDto> getStores(Pageable pageable, String storeName) {
+    public Page<StoreIdAndNameResponseDto> getStores(Pageable pageable, String storeName) {
 
-        Page<StoreIdAndNameResponseDto> stores = storeRepository.findStoreIdAndStoreNameByStoreName(pageable, storeName);
-
-        return ApiPagingResponseDto.success(SuccessCode.STORE_PAGING_SUCCESS, stores);
+        return storeRepository.findStoreIdAndStoreNameByStoreName(pageable, storeName);
     }
 
 
