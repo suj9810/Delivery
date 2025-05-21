@@ -1,12 +1,12 @@
 package com.example.delivery.domain.menu.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.delivery.common.exception.CustomException;
 import com.example.delivery.common.exception.enums.ErrorCode;
-import com.example.delivery.common.exception.enums.SuccessCode;
-import com.example.delivery.common.response.ApiResponseDto;
 import com.example.delivery.domain.menu.dto.request.MenuCreatRequest;
 import com.example.delivery.domain.menu.dto.request.MenuUpdateRequest;
 import com.example.delivery.domain.menu.dto.response.MenuResponse;
@@ -52,6 +52,11 @@ public class MenuService {
 		return MenuResponse.of(menu);
 	}
 
+	@Transactional(readOnly = true)
+	public Page<MenuResponse> getMenusByStore(Long storeId, Pageable pageable) {
+		return menuRepository.findMenusByStoreId(storeId, pageable);
+	}
+
 	/**
 	 * 메뉴 수정
 	 *
@@ -87,7 +92,8 @@ public class MenuService {
 	 * @param menuId
 	 * @return
 	 */
-	private Menu findMenuWithStoreAndUser(Long menuId) {
+	@Transactional(readOnly = true)
+	public Menu findMenuWithStoreAndUser(Long menuId) {
 		return menuRepository.findMenuById(menuId)
 			.orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
 	}
@@ -102,6 +108,4 @@ public class MenuService {
 			throw new CustomException(ErrorCode.OWNER_PERMISSION_REQUIRED);
 		}
 	}
-
-
 }
