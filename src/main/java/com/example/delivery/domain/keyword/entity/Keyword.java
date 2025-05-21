@@ -18,10 +18,6 @@ public class Keyword {
     @Column(nullable = false)
     private Long id;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "store_id", nullable = false)
-//    private Store store;
-
     @Column(nullable = false)
      private String keyword;
 
@@ -30,5 +26,19 @@ public class Keyword {
 
     @Column(name = "last_searched_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    public Keyword(String keyword) {
+        this.keyword = keyword;
+        this.count = 0;
+    }
+
+    public void increaseCount() {
+        this.count++;
+    }
+
+    public void updateTime() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
 
 }
