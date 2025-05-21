@@ -45,8 +45,8 @@ public class Menu extends BaseTimeEntity {
 	private int price;
 
 	public void updateMenu(MenuUpdateRequest request) {
-		this.name = name;
-		this.description = description;
-		this.price = price;
+		this.name = request.getName();
+		this.description = request.getDescription();
+		this.price = request.getPrice();
 	}
 }
