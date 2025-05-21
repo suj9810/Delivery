@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum SuccessCode {
     // 공통
     OK(HttpStatus.OK, "요청이 성공적으로 처리되었습니다."),
+    CREATE(HttpStatus.CREATED, "리소스가 성공적으로 생성되었습니다."),
 
     // 유저 관련
     SIGNUP_SUCCESS(HttpStatus.CREATED, "회원가입이 완료되었습니다."),
@@ -42,8 +43,12 @@ public enum SuccessCode {
     REVIEW_CREATED(HttpStatus.CREATED, "리뷰가 성공적으로 등록되었습니다."),
     REVIEW_SUCCESS_FIND(HttpStatus.OK, "리뷰를 성공적으로 조회하였습니다."),
     REVIEW_UPDATED(HttpStatus.OK, "리뷰가 성공적으로 수정되었습니다."),
-    REVIEW_DELETED(HttpStatus.OK, "리뷰가 성공적으로 삭제되었습니다.");
+    REVIEW_DELETED(HttpStatus.OK, "리뷰가 성공적으로 삭제되었습니다."),
 
+    // 즐겨찾기 관련
+    FAVORITE_ADDED(HttpStatus.CREATED, "즐겨찾기에 추가되었습니다."),
+    FAVORITE_DELETED(HttpStatus.OK, "즐겨찾기에서 제거되었습니다."),
+    FAVORITE_LIST(HttpStatus.OK,"즐겨찾기 목록을 성공적으로 조회했습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
