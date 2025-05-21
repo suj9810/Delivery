@@ -1,12 +1,12 @@
 package com.example.delivery.domain.menu.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.delivery.common.exception.CustomException;
 import com.example.delivery.common.exception.enums.ErrorCode;
-import com.example.delivery.common.exception.enums.SuccessCode;
-import com.example.delivery.common.response.ApiResponseDto;
 import com.example.delivery.domain.menu.dto.request.MenuCreatRequest;
 import com.example.delivery.domain.menu.dto.request.MenuUpdateRequest;
 import com.example.delivery.domain.menu.dto.response.MenuResponse;
@@ -35,7 +35,7 @@ public class MenuService {
 	 * @return the api response dto
 	 */
 	@Transactional
-	public ApiResponseDto<MenuResponse> createMenu(Long loginUserId, MenuCreatRequest request) {
+	public MenuResponse createMenu(Long loginUserId, MenuCreatRequest request) {
 		Store store = storeRepository.findById(request.getStoreId())
 			.orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 
@@ -49,14 +49,12 @@ public class MenuService {
 			.build();
 		menuRepository.save(menu);
 
-		MenuResponse response = MenuResponse.builder()
-			.id(menu.getId())
-			.name(menu.getName())
-			.description(menu.getDescription())
-			.price(menu.getPrice())
-			.build();
+		return MenuResponse.of(menu);
+	}
 
-		return ApiResponseDto.success(SuccessCode.MENU_CREATED, response);
+	@Transactional(readOnly = true)
+	public Page<MenuResponse> getMenusByStore(Long storeId, Pageable pageable) {
+		return menuRepository.findMenusByStoreId(storeId, pageable);
 	}
 
 	/**
@@ -68,19 +66,11 @@ public class MenuService {
 	 * @return the api response dto
 	 */
 	@Transactional
-	public ApiResponseDto<MenuResponse> updateMenu(Long loginUserid, Long menuId, MenuUpdateRequest request) {
-		Menu menu = findMenu(menuId, loginUserid);
-
+	public MenuResponse updateMenu(Long loginUserid, Long menuId, MenuUpdateRequest request) {
+		Menu menu = findMenuWithStoreAndUser(menuId);
+		validOwner(menu.getStore().getUser().getId(), loginUserid);
 		menu.updateMenu(request);
-
-		MenuResponse response = MenuResponse.builder()
-			.id(menu.getId())
-			.name(menu.getName())
-			.description(menu.getDescription())
-			.price(menu.getPrice())
-			.build();
-
-		return ApiResponseDto.success(SuccessCode.MENU_UPDATED, response);
+		return MenuResponse.of(menu);
 	}
 
 	/**
@@ -91,24 +81,21 @@ public class MenuService {
 	 * @return the api response dto
 	 */
 	@Transactional
-	public ApiResponseDto<MenuResponse> deleteMenu(Long loginUserid, Long menuId) {
-		Menu menu = findMenu(menuId, loginUserid);
-
+	public void deleteMenu(Long loginUserid, Long menuId) {
+		Menu menu = findMenuWithStoreAndUser(menuId);
+		validOwner(menu.getStore().getUser().getId(), loginUserid);
 		menuRepository.delete(menu);
-		return ApiResponseDto.success(SuccessCode.MENU_DELETED);
 	}
 
 	/**
 	 * 메뉴 ID 검증
 	 * @param menuId
-	 * @param loginUserId
 	 * @return
 	 */
-	private Menu findMenu(Long menuId, Long loginUserId) {
-		Menu menu = menuRepository.findById(menuId)
+	@Transactional(readOnly = true)
+	public Menu findMenuWithStoreAndUser(Long menuId) {
+		return menuRepository.findMenuById(menuId)
 			.orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
-		validOwner(menu.getStore().getUser().getId(), loginUserId);
-		return menu;
 	}
 
 	/**
@@ -121,6 +108,4 @@ public class MenuService {
 			throw new CustomException(ErrorCode.OWNER_PERMISSION_REQUIRED);
 		}
 	}
-
-
 }

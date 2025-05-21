@@ -11,6 +11,7 @@ import com.example.delivery.domain.store.dto.response.StoreIdAndNameResponseDto;
 import com.example.delivery.domain.store.dto.response.StoreResponseDto;
 import com.example.delivery.domain.store.service.StoreService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -41,9 +42,9 @@ public class StoreController {
             @PageableDefault(direction = Sort.Direction.DESC, sort = "createdAt") Pageable pageable,
             @Validated @RequestParam String storeName
     ) {
-        ApiPagingResponseDto<StoreIdAndNameResponseDto> stores = storeService.getStores(pageable, storeName);
+        Page<StoreIdAndNameResponseDto> stores = storeService.getStores(pageable, storeName);
 
-        return ResponseEntity.ok().body(stores);
+        return ResponseEntity.ok().body(ApiPagingResponseDto.success(SuccessCode.STORE_PAGING_SUCCESS, stores));
     }
 
     // 단건 조회
