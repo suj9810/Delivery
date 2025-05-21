@@ -13,7 +13,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
@@ -31,3 +31,4 @@ jwt:
   secret: my-secret-key-jwt-secret-key-example-delivery
   access-token-expiration: 3600000
   refresh-token-expiration: 1209600000
+

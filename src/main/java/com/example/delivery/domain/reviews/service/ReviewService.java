@@ -1,5 +1,8 @@
 package com.example.delivery.domain.reviews.service;
 
+import java.util.List;
+
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -7,9 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.delivery.common.exception.CustomException;
 import com.example.delivery.common.exception.enums.ErrorCode;
-import com.example.delivery.common.exception.enums.SuccessCode;
-import com.example.delivery.common.response.ApiPagingResponseDto;
-import com.example.delivery.common.response.ApiResponseDto;
 import com.example.delivery.domain.auth.jwt.UserDetailsImpl;
 import com.example.delivery.domain.reviews.dto.request.ReviewCreateRequest;
 import com.example.delivery.domain.reviews.dto.request.ReviewFindCondition;
@@ -30,6 +30,7 @@ public class ReviewService {
 	private final com.example.delivery.domain.user.repository.UserRepository userRepository;
 	private final StoreRepository storeRepository;
 
+	@Transactional
 	public Long saveReview(UserDetailsImpl userDetails, ReviewCreateRequest dto) {
 
 		Store store = storeRepository.findById(dto.getStoreId()).orElseThrow(() -> new CustomException(
@@ -46,11 +47,14 @@ public class ReviewService {
 		return review.getId();
 	}
 
+	@Transactional(readOnly = true)
 	public Page<ReviewFindResponse> getReviews(ReviewFindCondition condition, Pageable pageable) {
 		Page<ReviewFindResponse> page = reviewRepository.findReviewWithCondition(condition, pageable);
 
 		return page;
 	}
+
+
 
 	@Transactional
 	public Long updateReview(UserDetailsImpl user, Long reviewId, ReviewUpdateRequest dto) {
@@ -69,5 +73,46 @@ public class ReviewService {
 		review.validateOwner(user.getUser());
 
 		reviewRepository.delete(review);
+	}
+
+	public List<ReviewFindResponse> getReviewsWithoutCache() {
+		long start = System.currentTimeMillis();
+
+		List<ReviewFindResponse> responses = reviewRepository.findAll().stream()
+			.map(review -> ReviewFindResponse.builder()
+				.reviewId(review.getId())
+				.storeId(review.getStore().getId())
+				.rating(review.getRating())
+				.content(review.getContent())
+				.createdAt(review.getCreatedAt())
+				.modifiedAt(review.getUpdatedAt())
+				.build())
+			.toList();
+
+		long end = System.currentTimeMillis();
+		System.out.println("[Without Cache] 소요 시간: " + (end - start) + "ms");
+
+		return responses;
+	}
+
+	@Cacheable(value = "caffeineReviews", cacheManager = "caffeineCacheManager")
+	public List<ReviewFindResponse> getReviewsWithCache() {
+		long start = System.currentTimeMillis();
+
+		List<ReviewFindResponse> result = reviewRepository.findAll().stream()
+			.map(review -> ReviewFindResponse.builder()
+				.reviewId(review.getId())
+				.storeId(review.getStore().getId())
+				.rating(review.getRating())
+				.content(review.getContent())
+				.createdAt(review.getCreatedAt())
+				.modifiedAt(review.getUpdatedAt())
+				.build())
+			.toList();
+
+		long end = System.currentTimeMillis();
+		System.out.println("[With Cache] 소요 시간: " + (end - start) + "ms");
+
+		return result;
 	}
 }

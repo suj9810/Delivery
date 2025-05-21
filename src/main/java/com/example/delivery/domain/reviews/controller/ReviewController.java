@@ -1,5 +1,7 @@
 package com.example.delivery.domain.reviews.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -64,6 +66,20 @@ public class ReviewController {
 	) {
 		Page<ReviewFindResponse> reviews = reviewService.getReviews(condition, pageable);
 		return ResponseEntity.status(HttpStatus.OK).body(ApiPagingResponseDto.success(SuccessCode.REVIEW_SUCCESS_FIND, reviews));
+	}
+
+	@GetMapping("/no-cache")
+	public ResponseEntity<ApiResponseDto<?>> findReviewWithoutCache() {
+		List<ReviewFindResponse> reviews = reviewService.getReviewsWithoutCache();
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(ApiResponseDto.success(SuccessCode.REVIEW_SUCCESS_FIND, reviews));
+	}
+
+	@GetMapping("/with-cache")
+	public ResponseEntity<ApiResponseDto<?>> findReviewWithCache() {
+		List<ReviewFindResponse> reviews = reviewService.getReviewsWithCache();
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(ApiResponseDto.success(SuccessCode.REVIEW_SUCCESS_FIND, reviews));
 	}
 
 	/**
