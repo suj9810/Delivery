@@ -59,6 +59,7 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.POST, "/menus").hasRole("OWNER")
 				.requestMatchers(HttpMethod.PUT, "menus/*").hasRole("OWNER")
 				.requestMatchers(HttpMethod.DELETE, "/menus/*").hasRole("OWNER")
+				.requestMatchers(HttpMethod.GET, "/menus").permitAll()
 				.requestMatchers(AUTH_WHITELIST).permitAll() // 비회원도 접근 가능한 경로, 인증 없이 접근 허용
 				.anyRequest().authenticated() // 그외 경로 : 반드시 인증 진행
 		);
