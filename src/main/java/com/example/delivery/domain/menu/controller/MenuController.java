@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.delivery.common.exception.enums.SuccessCode;
+import com.example.delivery.common.response.ApiPagingResponseDto;
 import com.example.delivery.common.response.ApiResponseDto;
 import com.example.delivery.domain.auth.jwt.UserDetailsImpl;
 import com.example.delivery.domain.menu.dto.request.MenuCreatRequest;
@@ -54,12 +55,12 @@ public class MenuController {
 	}
 
 	@GetMapping
-	public ResponseEntity<ApiResponseDto<Page<MenuResponse>>> getMenusByStore (
+	public ResponseEntity<ApiPagingResponseDto<MenuResponse>> getMenusByStore (
 		@RequestParam("storeId") Long storeId,
 		@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
 	) {
 		Page<MenuResponse> response = menuService.getMenusByStore(storeId, pageable);
-		return ResponseEntity.status(HttpStatus.OK).body(ApiResponseDto.success(SuccessCode.MENU_PAGING_SUCCESS, response));
+		return ResponseEntity.status(HttpStatus.OK).body(ApiPagingResponseDto.success(SuccessCode.MENU_PAGING_SUCCESS, response));
 	}
 
 	/**
