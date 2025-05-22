@@ -48,3 +48,9 @@ out/
 /build.gradle
 /.gradle/
 /.idea/
+
+# application.yml 파일 무시
+application.yml
+# Spring Boot 설정 파일
+application*.yml
+application*.properties
