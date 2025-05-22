@@ -19,7 +19,7 @@ public class Keyword {
     private Long id;
 
     @Column(nullable = false)
-     private String keyword;
+    private String keyword;
 
     @Column(nullable = false)
     private int count;
@@ -29,7 +29,8 @@ public class Keyword {
 
     public Keyword(String keyword) {
         this.keyword = keyword;
-        this.count = 0;
+        this.count = 1;
+        this.updatedAt = LocalDateTime.now();
     }
 
     public void increaseCount() {
@@ -39,6 +40,4 @@ public class Keyword {
     public void updateTime() {
         this.updatedAt = LocalDateTime.now();
     }
-
-
 }

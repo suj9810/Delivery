@@ -27,6 +27,9 @@ spring:
       port: 6379
       password:
 
+  cache:
+    type: simple
+
 jwt:
   secret: my-secret-key-jwt-secret-key-example-delivery
   access-token-expiration: 3600000
