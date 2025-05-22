@@ -2,11 +2,13 @@ package com.example.delivery.domain.store.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor(force = true)
 public class StoreResponseDto {
     private final Long id;
     private final String storeName;
