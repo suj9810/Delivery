@@ -14,6 +14,10 @@ public class PopularKeywordDto implements Serializable {
     private Integer rank;
     private String keyword;
 
+    public PopularKeywordDto() {
+
+    }
+
     public PopularKeywordDto(Integer rank, String keyword) {
         this.rank = rank;
         this.keyword = keyword;

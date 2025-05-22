@@ -13,6 +13,10 @@ public class KeywordResponseDto implements Serializable {
 
     private String storeName;
 
+    public KeywordResponseDto() {
+        // Jackson이 기본 생성자를 통해 객체를 만들 수 있도록 함
+    }
+
     public KeywordResponseDto(String storeName) {
         this.storeName = storeName;
     }

@@ -1,5 +1,6 @@
 package com.example.delivery.domain.keyword.controller;
 
+import com.example.delivery.common.response.PagingResponse;
 import com.example.delivery.domain.keyword.dto.response.KeywordResponseDto;
 import com.example.delivery.domain.keyword.dto.response.PopularKeywordDto;
 import com.example.delivery.domain.keyword.service.KeywordService;
@@ -27,7 +28,7 @@ public class KeywordController {
 
     // v2
     @GetMapping("/v2/keywords/search")
-    public ResponseEntity<Page<KeywordResponseDto>> searchWithCache(@RequestParam String keyword,
+    public ResponseEntity<PagingResponse<KeywordResponseDto>> searchWithCache(@RequestParam String keyword,
         @PageableDefault(size = 10, page = 0) Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(keywordService.searchV2(keyword, pageable));
     }
@@ -40,7 +41,7 @@ public class KeywordController {
 
     // 인기 검색어 조회 v2
     @GetMapping("/v2/keywords/popular")
-    public ResponseEntity<Page<PopularKeywordDto>> getPopularKeywordsWithCache(@PageableDefault(size = 10, page = 0) Pageable pageable) {
+    public ResponseEntity<PagingResponse<PopularKeywordDto>> getPopularKeywordsWithCache(@PageableDefault(size = 10, page = 0) Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(keywordService.getPopularKeywordsV2(pageable));
     }
 

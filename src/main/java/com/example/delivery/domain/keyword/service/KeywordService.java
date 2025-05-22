@@ -1,5 +1,6 @@
 package com.example.delivery.domain.keyword.service;
 
+import com.example.delivery.common.response.PagingResponse;
 import com.example.delivery.domain.keyword.dto.response.KeywordResponseDto;
 import com.example.delivery.domain.keyword.dto.response.PopularKeywordDto;
 import com.example.delivery.domain.keyword.entity.Keyword;
@@ -9,13 +10,14 @@ import com.example.delivery.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -28,6 +30,8 @@ public class KeywordService {
     private final KeywordRepository keywordRepository;
     private final KeywordCacheService keywordCacheService;
     private final StoreRepository storeRepository;
+
+    private final RedisTemplate<String, Object> redisTemplateObject;
 
     // 검색 로그 저장 및 조회 (캐시 미적용)
     public Page<KeywordResponseDto> searchV1(String keyword, Pageable pageable) {
@@ -67,25 +71,37 @@ public class KeywordService {
         return page;
     }
 
-    public Page<KeywordResponseDto> searchV2(String keyword, Pageable pageable) {
-        Page<KeywordResponseDto> result = keywordCacheService.searchWithCache(keyword, pageable); // 캐시 적용 된 조회
+    public PagingResponse<KeywordResponseDto> searchV2(String keyword, Pageable pageable) {
+        PagingResponse<KeywordResponseDto> result = keywordCacheService.searchWithCache(keyword, pageable); // 캐시 적용 된 조회
         keywordCacheService.updateKeywordCount(keyword);
         return result;
     }
 
     // 인기 검색어 조회
     @Transactional(readOnly = true)
-    @Cacheable(value = "popularKeywords", key = "'result::page=' + #pageable.pageNumber + '&size=' + #pageable.pageSize")
-    public Page<PopularKeywordDto> getPopularKeywordsV2(Pageable pageable) {
-        log.info("Popular Keyword  Cache");
-        AtomicInteger counter = new AtomicInteger(1);
-        Page<String> keywords = keywordRepository.findPopularKeywords(pageable);
+    public PagingResponse<PopularKeywordDto> getPopularKeywordsV2(Pageable pageable) {
+        String cacheKey = "popularKeywords::page=" + pageable.getPageNumber() + "&size=" + pageable.getPageSize();
 
+        PagingResponse<PopularKeywordDto> cacheData = (PagingResponse<PopularKeywordDto>)redisTemplateObject.opsForValue().get(cacheKey);
+        if (cacheData != null) {
+            return cacheData;
+        }
+
+        log.info("Popular Keyword Cache");
+
+        // Cache miss
+        int startRank = pageable.getPageNumber() * pageable.getPageSize() + 1;
+        AtomicInteger counter = new AtomicInteger(startRank);
+
+        Page<String> keywords = keywordRepository.findPopularKeywords(pageable);
         List<PopularKeywordDto> list = keywords.getContent().stream()
             .map(keyword -> new PopularKeywordDto(counter.getAndIncrement(), keyword))
             .toList();
 
         Page<PopularKeywordDto> page = new PageImpl<>(list, pageable, keywords.getTotalElements());
-        return page;
+        PagingResponse<PopularKeywordDto> result = PagingResponse.from(page);
+
+        redisTemplateObject.opsForValue().set(cacheKey, result, Duration.ofMinutes(1));
+        return result;
     }
 }
