@@ -2,6 +2,7 @@ package com.example.delivery.domain.store.service;
 
 import com.example.delivery.common.exception.CustomException;
 import com.example.delivery.common.exception.enums.ErrorCode;
+import com.example.delivery.common.response.PagingResponse;
 import com.example.delivery.domain.auth.jwt.UserDetailsImpl;
 import com.example.delivery.domain.store.dto.request.SaveStoreRequestDto;
 import com.example.delivery.domain.store.dto.request.UpdateStoreRequestDto;
@@ -14,8 +15,10 @@ import com.example.delivery.domain.user.entity.User;
 import com.example.delivery.domain.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,7 @@ public class StoreService {
 
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
+    private final RedisTemplate<String, Object> redisTemplateObject;
 
     @Transactional
     public SaveStoreResponseDto saveStore(UserDetailsImpl userDetails, SaveStoreRequestDto dto) {
@@ -54,12 +58,36 @@ public class StoreService {
     }
 
     @Transactional(readOnly = true)
-    public Page<StoreIdAndNameResponseDto> getStores(Pageable pageable, String storeName) {
+//    @Cacheable(value = "storeCache", key = "#storeName")
+    public PagingResponse<StoreIdAndNameResponseDto>getStores(Pageable pageable, String storeName) {
+        // N페이지만 캐시에 담기
+        if (pageable.getPageNumber() == 0) {
+            String cacheKey = "storeCache::" + storeName + "::" + pageable;
+            // Cache hit
+            PagingResponse<StoreIdAndNameResponseDto> dtos = (PagingResponse<StoreIdAndNameResponseDto>) redisTemplateObject.opsForValue().get(cacheKey);
+            if (dtos != null) {
+                return dtos;
+            }
 
-        return storeRepository.findStoreIdAndStoreNameByStoreName(pageable, storeName);
+            // Cache miss
+            Page<StoreIdAndNameResponseDto> page = storeRepository.findStoreIdAndStoreNameByStoreName(pageable, storeName);
+            PagingResponse<StoreIdAndNameResponseDto> pagingResponse = PagingResponse.from(page);
+
+            // Cache miss -> 캐시와 DB 동기화
+            redisTemplateObject.opsForValue().set(cacheKey, pagingResponse);
+
+            return pagingResponse;
+
+        } else {
+            Page<StoreIdAndNameResponseDto> page = storeRepository.findStoreIdAndStoreNameByStoreName(pageable, storeName);
+            PagingResponse<StoreIdAndNameResponseDto> pagingResponse = PagingResponse.from(page);
+            return pagingResponse;
+
+        }
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "storeCache", key = "#storeId")
     public StoreResponseDto getStore(Long storeId) {
         
         Store store = findByIdOrElseThrow(storeId);
