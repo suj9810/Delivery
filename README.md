@@ -45,7 +45,7 @@ Redis를 활용해 로그인 세션 관리와 함께 일부 데이터에 대한 
 ## 🔗 링크(깃허브, 명세서)
 
 - [팀 프로젝트 GitHub Repository](https://github.com/suj9810/Delivery.git)
-- [API 명세서 (Notion 링크)](https://www.notion.so/teamsparta/19-API-1dd2dc3ef514809798b6dca67b18e0e9)
+- [API 명세서 (Notion 링크)](https://www.notion.so/teamsparta/7-1e52dc3ef51480628dece32105f5bff0)
 
 ### API Endpoints
 
