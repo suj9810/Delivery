@@ -73,7 +73,6 @@ public class MenuService {
 	 * @param request the request 
 	 * @return the api response dto
 	 */
-	@CacheEvict(value = "menuByStore", key = "'store:' + #menu.store.id")
 	@Transactional
 	public MenuResponse updateMenu(Long loginUserid, Long menuId, MenuUpdateRequest request) {
 		Menu menu = findMenuWithStoreAndUser(menuId);
@@ -89,7 +88,6 @@ public class MenuService {
 	 * @param menuId the menu id 
 	 * @return the api response dto
 	 */
-	@CacheEvict(value = "menuByStore", key = "'store:' + #menu.store.id")
 	@Transactional
 	public void deleteMenu(Long loginUserid, Long menuId) {
 		Menu menu = findMenuWithStoreAndUser(menuId);
