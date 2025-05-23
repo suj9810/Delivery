@@ -1,6 +1,8 @@
 package com.example.delivery.domain.menu.dto.response;
 
 import com.example.delivery.domain.menu.entity.Menu;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.querydsl.core.annotations.QueryProjection;
 
 import lombok.AllArgsConstructor;
@@ -41,5 +43,18 @@ public class MenuResponse {
 				.description(menu.getDescription())
 				.price(menu.getPrice())
 				.build();
+	}
+
+	@JsonCreator
+	public MenuResponse(
+		@JsonProperty("id") Long id,
+		@JsonProperty("name") String name,
+		@JsonProperty("description") String description,
+		@JsonProperty("price") int price
+	) {
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.price = price;
 	}
 }

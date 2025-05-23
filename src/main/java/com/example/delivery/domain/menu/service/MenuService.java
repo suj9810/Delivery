@@ -1,5 +1,7 @@
 package com.example.delivery.domain.menu.service;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -7,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.delivery.common.exception.CustomException;
 import com.example.delivery.common.exception.enums.ErrorCode;
+import com.example.delivery.common.response.PagingResponse;
 import com.example.delivery.domain.menu.dto.request.MenuCreatRequest;
 import com.example.delivery.domain.menu.dto.request.MenuUpdateRequest;
 import com.example.delivery.domain.menu.dto.response.MenuResponse;
@@ -16,11 +19,13 @@ import com.example.delivery.domain.store.entity.Store;
 import com.example.delivery.domain.store.repository.StoreRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Menu service.
  */
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class MenuService {
 
@@ -52,9 +57,12 @@ public class MenuService {
 		return MenuResponse.of(menu);
 	}
 
+	@Cacheable(value = "menuByStore",
+		key = "'store:' + #storeId + ':page' + #pageable.pageNumber + ':size:' + #pageable.pageSize + ':sort:' + #pageable.sort.toString()")
 	@Transactional(readOnly = true)
-	public Page<MenuResponse> getMenusByStore(Long storeId, Pageable pageable) {
-		return menuRepository.findMenusByStoreId(storeId, pageable);
+	public PagingResponse<MenuResponse> getMenusByStore(Long storeId, Pageable pageable) {
+		Page<MenuResponse> menus = menuRepository.findMenusByStoreId(storeId, pageable);
+		return PagingResponse.from(menus);
 	}
 
 	/**
@@ -65,6 +73,7 @@ public class MenuService {
 	 * @param request the request 
 	 * @return the api response dto
 	 */
+	@CacheEvict(value = "menuByStore", key = "'store:' + #menu.store.id")
 	@Transactional
 	public MenuResponse updateMenu(Long loginUserid, Long menuId, MenuUpdateRequest request) {
 		Menu menu = findMenuWithStoreAndUser(menuId);
@@ -80,6 +89,7 @@ public class MenuService {
 	 * @param menuId the menu id 
 	 * @return the api response dto
 	 */
+	@CacheEvict(value = "menuByStore", key = "'store:' + #menu.store.id")
 	@Transactional
 	public void deleteMenu(Long loginUserid, Long menuId) {
 		Menu menu = findMenuWithStoreAndUser(menuId);

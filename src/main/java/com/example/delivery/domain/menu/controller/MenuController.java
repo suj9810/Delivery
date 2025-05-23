@@ -1,6 +1,5 @@
 package com.example.delivery.domain.menu.controller;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -18,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.delivery.common.exception.enums.SuccessCode;
-import com.example.delivery.common.response.ApiPagingResponseDto;
 import com.example.delivery.common.response.ApiResponseDto;
+import com.example.delivery.common.response.PagingResponse;
 import com.example.delivery.domain.auth.jwt.UserDetailsImpl;
 import com.example.delivery.domain.menu.dto.request.MenuCreatRequest;
 import com.example.delivery.domain.menu.dto.request.MenuUpdateRequest;
@@ -55,12 +54,12 @@ public class MenuController {
 	}
 
 	@GetMapping
-	public ResponseEntity<ApiPagingResponseDto<MenuResponse>> getMenusByStore (
+	public ResponseEntity<ApiResponseDto<PagingResponse<MenuResponse>>> getMenusByStore (
 		@RequestParam("storeId") Long storeId,
 		@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
 	) {
-		Page<MenuResponse> response = menuService.getMenusByStore(storeId, pageable);
-		return ResponseEntity.status(HttpStatus.OK).body(ApiPagingResponseDto.success(SuccessCode.MENU_PAGING_SUCCESS, response));
+		PagingResponse<MenuResponse> response = menuService.getMenusByStore(storeId, pageable);
+		return ResponseEntity.status(HttpStatus.OK).body(ApiResponseDto.success(SuccessCode.MENU_PAGING_SUCCESS, response));
 	}
 
 	/**
