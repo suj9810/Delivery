@@ -42,9 +42,10 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
 			))
 			.from(review)
 			.where(
-				review.store.id.eq(condition.getStoreId()),
-				minRating(condition.getMinRating()),
-				maxRating(condition.getMaxRating())
+				// review.store.id.eq(1L),
+				// minRating(condition.getMinRating()),
+				// maxRating(condition.getMaxRating())
+				review.store.id.eq(1L)
 			)
 			.orderBy(review.createdAt.desc(), review.id.desc())
 			.offset(pageable.getOffset())
@@ -55,21 +56,20 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
 			.select(review)
 			.from(review)
 			.where(
-				review.store.id.eq(condition.getStoreId()),
-				minRating(condition.getMinRating()),
-				maxRating(condition.getMaxRating())
+				// review.store.id.eq(condition.getStoreId()),
+				// minRating(condition.getMinRating()),
+				// maxRating(condition.getMaxRating())
+				review.store.id.eq(1L)
 			);
 
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);
 	}
 
-	private BooleanExpression minRating(Long minRating) {
-		return minRating != null ? review.rating.goe(minRating) : null;
-	}
-
-	private BooleanExpression maxRating(Long maxRating) {
-		return maxRating != null ? review.rating.loe(maxRating) : null;
-	}
-
-
+	// private BooleanExpression minRating(Long minRating) {
+	// 	return minRating != null ? review.rating.goe(minRating) : null;
+	// }
+	//
+	// private BooleanExpression maxRating(Long maxRating) {
+	// 	return maxRating != null ? review.rating.loe(maxRating) : null;
+	// }
 }

@@ -27,6 +27,7 @@ import com.example.delivery.domain.reviews.dto.request.ReviewCreateRequest;
 import com.example.delivery.domain.reviews.dto.request.ReviewFindCondition;
 import com.example.delivery.domain.reviews.dto.request.ReviewUpdateRequest;
 import com.example.delivery.domain.reviews.dto.response.ReviewFindResponse;
+import com.example.delivery.domain.reviews.dto.response.ReviewFindResponseCache;
 import com.example.delivery.domain.reviews.service.ReviewService;
 
 import lombok.RequiredArgsConstructor;
@@ -75,9 +76,16 @@ public class ReviewController {
 			.body(ApiResponseDto.success(SuccessCode.REVIEW_SUCCESS_FIND, reviews));
 	}
 
-	@GetMapping("/with-cache")
-	public ResponseEntity<ApiResponseDto<?>> findReviewWithCache() {
-		List<ReviewFindResponse> reviews = reviewService.getReviewsWithCache();
+	@GetMapping("/with-cache-caffeine")
+	public ResponseEntity<ApiResponseDto<?>> findReviewWithCacheCaffeine() {
+		List<ReviewFindResponse> reviews = reviewService.getReviewsWithCacheCaffeine();
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(ApiResponseDto.success(SuccessCode.REVIEW_SUCCESS_FIND, reviews));
+	}
+
+	@GetMapping("/with-cache-redis")
+	public ResponseEntity<ApiResponseDto<?>> findReviewWithCacheRedis() {
+		List<ReviewFindResponseCache> reviews = reviewService.getReviewsWithCacheRedis();
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(ApiResponseDto.success(SuccessCode.REVIEW_SUCCESS_FIND, reviews));
 	}

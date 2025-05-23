@@ -1,10 +1,12 @@
 package com.example.delivery.domain.reviews.service;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,7 @@ import com.example.delivery.domain.reviews.dto.request.ReviewCreateRequest;
 import com.example.delivery.domain.reviews.dto.request.ReviewFindCondition;
 import com.example.delivery.domain.reviews.dto.request.ReviewUpdateRequest;
 import com.example.delivery.domain.reviews.dto.response.ReviewFindResponse;
+import com.example.delivery.domain.reviews.dto.response.ReviewFindResponseCache;
 import com.example.delivery.domain.reviews.entity.Review;
 import com.example.delivery.domain.reviews.repository.ReviewRepository;
 import com.example.delivery.domain.store.entity.Store;
@@ -27,8 +30,12 @@ import lombok.RequiredArgsConstructor;
 public class ReviewService {
 
 	private final ReviewRepository reviewRepository;
-	private final com.example.delivery.domain.user.repository.UserRepository userRepository;
 	private final StoreRepository storeRepository;
+
+	private final RedisTemplate<String, Object> redisTemplateObject;
+
+	private static final String CACHE_KEY = "reviews:all";
+	private static final String PAGING_CACHE_KEY = "paging:reviews:all";
 
 	@Transactional
 	public Long saveReview(UserDetailsImpl userDetails, ReviewCreateRequest dto) {
@@ -49,12 +56,21 @@ public class ReviewService {
 
 	@Transactional(readOnly = true)
 	public Page<ReviewFindResponse> getReviews(ReviewFindCondition condition, Pageable pageable) {
+
+		// // 캐시에서 조회
+		// Page<ReviewFindResponse> cachedReviews = (Page<ReviewFindResponse>) redisTemplate.opsForValue().get(PAGING_CACHE_KEY);
+		// if (cachedReviews != null) {
+		// 	return cachedReviews;
+		// }
+
+		// DB에서 조회
 		Page<ReviewFindResponse> page = reviewRepository.findReviewWithCondition(condition, pageable);
+
+		// // 캐시에 저장
+		// redisTemplate.opsForValue().set(PAGING_CACHE_KEY, page);
 
 		return page;
 	}
-
-
 
 	@Transactional
 	public Long updateReview(UserDetailsImpl user, Long reviewId, ReviewUpdateRequest dto) {
@@ -75,9 +91,8 @@ public class ReviewService {
 		reviewRepository.delete(review);
 	}
 
+	// 캐싱 없이
 	public List<ReviewFindResponse> getReviewsWithoutCache() {
-		long start = System.currentTimeMillis();
-
 		List<ReviewFindResponse> responses = reviewRepository.findAll().stream()
 			.map(review -> ReviewFindResponse.builder()
 				.reviewId(review.getId())
@@ -88,16 +103,12 @@ public class ReviewService {
 				.modifiedAt(review.getUpdatedAt())
 				.build())
 			.toList();
-
-		long end = System.currentTimeMillis();
-		System.out.println("[Without Cache] 소요 시간: " + (end - start) + "ms");
-
 		return responses;
 	}
 
+	// 어노테이션을 활용한 caffeine(local-memory) 캐싱
 	@Cacheable(value = "caffeineReviews", cacheManager = "caffeineCacheManager")
-	public List<ReviewFindResponse> getReviewsWithCache() {
-		long start = System.currentTimeMillis();
+	public List<ReviewFindResponse> getReviewsWithCacheCaffeine() {
 
 		List<ReviewFindResponse> result = reviewRepository.findAll().stream()
 			.map(review -> ReviewFindResponse.builder()
@@ -110,8 +121,29 @@ public class ReviewService {
 				.build())
 			.toList();
 
-		long end = System.currentTimeMillis();
-		System.out.println("[With Cache] 소요 시간: " + (end - start) + "ms");
+		return result;
+	}
+
+	// 수동으로 레디스에 캐싱하기
+	public List<ReviewFindResponseCache> getReviewsWithCacheRedis() {
+		// 캐시에서 조회
+		Object cachedReviews = redisTemplateObject.opsForValue().get(CACHE_KEY);
+		if (cachedReviews != null && cachedReviews instanceof List<?> list && !list.isEmpty()) {
+			return (List<ReviewFindResponseCache>) list;
+		}
+
+		List<ReviewFindResponseCache> result = reviewRepository.findAll().stream()
+			.map(review -> ReviewFindResponseCache.builder()
+				.reviewId(review.getId())
+				.storeId(review.getStore().getId())
+				.rating(review.getRating())
+				.content(review.getContent())
+				.createdAt(review.getCreatedAt().toString())
+				.modifiedAt(review.getUpdatedAt().toString())
+				.build())
+			.toList();
+
+		redisTemplateObject.opsForValue().set(CACHE_KEY, result, Duration.ofMinutes(10));
 
 		return result;
 	}

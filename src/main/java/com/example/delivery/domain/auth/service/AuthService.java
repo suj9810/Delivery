@@ -21,15 +21,15 @@ import com.example.delivery.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
 	private final UserRepository userRepository;
 	private final CustomPasswordEncoder passwordEncoder;
 	private final TokenProvider tokenProvider;
 	private final RefreshTokenRepository refreshTokenRepository;
-	private final RedisTemplate<String, String> redisTemplate;
+	private final RedisTemplate<String, String> redisTemplateString;
 
 	@Value("${jwt.refresh-token-expiration}")
 	private long refreshTokenExpiration;
@@ -147,7 +147,7 @@ public class AuthService {
 
 		// Redis에서 RT 삭제
 		String key = "RT:" + user.getId();
-		redisTemplate.delete(key);
+		redisTemplateString.delete(key);
 	}
 
 	// 회원 탈퇴 - Hard Deleted
@@ -167,6 +167,6 @@ public class AuthService {
 
 		// Redis RT 삭제
 		String key = "RT:" + userId;
-		redisTemplate.delete(key);
+		redisTemplateString.delete(key);
 	}
 }
